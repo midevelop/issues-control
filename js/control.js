@@ -1,36 +1,33 @@
 var app = new Vue({
   el: '#app',
   data: {
-    // title: 'Еноты',
-    current: 0,
-    show: false,
-    groups: [{ name: '', title: 'Еноты', people: [] }],
-    currentGroup: 0
-  },
-  mounted() {
-    axios
-      .get('./docs/group.json')
-      .then(response => (this.groups = response.data.groups));
+    username: 'midevelop',
+    urlBase: 'https://api.github.com',
+    user: {},
+    repos: [],
+    error: ''
   },
   computed: {
-    people() {
-      return this.groups[this.currentGroup].people;
-    },
-    title() {
-      return this.groups[this.currentGroup].title;
-    },
-    showPeople() {
-      return this.people.slice(this.current, this.current + 3);
+    issuesCount() {
+      return this.repos.reduce((sum, repo) => sum + repo.open_issues, 0);
     }
   },
   methods: {
-    nextAvatar() {
-      this.show = false;
-      if (this.current > this.people.length - 4) this.current = 0;
-      else this.current++;
+    fetchAllData() {
+      this.fetchUser();
+      this.fetchRepose();
     },
-    changeGroup(index) {
-      this.currentGroup = index;
+    fetchUser() {
+      axios
+        .get(`${this.urlBase}/users/${this.username}`)
+        .then(response => (this.user = response.data))
+        .catch(error => (this.error = error));
+    },
+    fetchRepose() {
+      axios
+        .get(`${this.urlBase}/users/${this.username}/repos`)
+        .then(response => (this.repos = response.data))
+        .catch(error => (this.error = error));
     }
   }
 });

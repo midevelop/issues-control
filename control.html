@@ -22,10 +22,42 @@
   </head>
   <body>
     <div class="container" id="app">
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Issues Control</a>
-      </nav>
+      <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="#">Issues Control</a>
+        </nav>
+      </header>
+      <main>
+        <p>
+          <i>Сервис позволяет проверть кол-во открытых issues пользователя</i>
+          <i>Существует лимит на кол-во запросов</i>
+        </p>
+        <div class="form-inline">
+          <button class="btn btn-outline-primary mr-3" @click="fetchAllData">
+            Проверить репозиторий
+          </button>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Логин GitHub"
+            v-model="username"
+          />
+        </div>
+        <hr />
+        <div>
+          <pre>{{ error }}</pre>
+          <h2>Кол-во открытых Issues</h2>
+          <pre>{{ issuesCount }}</pre>
+          <hr />
+          <h2>Репозитории</h2>
+          <pre>{{ JSON.stringify(repos, null, 2) }}</pre>
+          <hr />
+          <h2>Пользователь</h2>
+          <pre>{{ JSON.stringify(user, null, 2) }}</pre>
+        </div>
+      </main>
     </div>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script
