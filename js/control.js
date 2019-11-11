@@ -1,8 +1,9 @@
 var app = new Vue({
   el: '#app',
   data: {
-    username: 'midevelop',
+    username: 'Lyumih',
     urlBase: 'https://api.github.com',
+    rateLimit: null,
     user: {},
     repos: [],
     error: ''
@@ -12,21 +13,31 @@ var app = new Vue({
       return this.repos.reduce((sum, repo) => sum + repo.open_issues, 0);
     }
   },
+  mounted() {
+    this.fetchRateLimit();
+  },
   methods: {
     fetchAllData() {
       this.fetchUser();
-      this.fetchRepose();
+      this.fetchRepos();
+      this.fetchRateLimit();
     },
-    fetchUser() {
-      axios
+    async fetchUser() {
+      await axios
         .get(`${this.urlBase}/users/${this.username}`)
         .then(response => (this.user = response.data))
         .catch(error => (this.error = error));
     },
-    fetchRepose() {
-      axios
+    async fetchRepos() {
+      await axios
         .get(`${this.urlBase}/users/${this.username}/repos`)
         .then(response => (this.repos = response.data))
+        .catch(error => (this.error = error));
+    },
+    async fetchRateLimit() {
+      await axios
+        .get(`${this.urlBase}/rate_limit`)
+        .then(response => (this.rateLimit = response.data))
         .catch(error => (this.error = error));
     }
   }

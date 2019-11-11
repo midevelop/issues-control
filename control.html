@@ -32,6 +32,17 @@
           <i>Сервис позволяет проверть кол-во открытых issues пользователя</i>
           <i>Существует лимит на кол-во запросов</i>
         </p>
+        <div v-if="rateLimit" title="Для авторизированных пользователей лимит 5000 в час">
+          <p></p>
+            Лимит запросов: {{ rateLimit.rate.remaining }} из
+            {{ rateLimit.rate.limit }}.
+          </p>
+          <p>
+            Обновится в
+            {{new Date( rateLimit.rate.reset * 1000).getHours()}}:{{new Date( rateLimit.rate.reset * 1000).getMinutes()}}
+          </p>
+        </div>
+
         <div class="form-inline">
           <button class="btn btn-outline-primary mr-3" @click="fetchAllData">
             Проверить репозиторий
@@ -49,11 +60,11 @@
           <h2>Кол-во открытых Issues</h2>
           <pre>{{ issuesCount }}</pre>
           <hr />
+          <h2>Пользователь</h2>
+          <pre>{{ JSON.stringify(user, null, 2) }}</pre>
           <h2>Репозитории</h2>
           <pre>{{ JSON.stringify(repos, null, 2) }}</pre>
           <hr />
-          <h2>Пользователь</h2>
-          <pre>{{ JSON.stringify(user, null, 2) }}</pre>
         </div>
       </main>
     </div>
