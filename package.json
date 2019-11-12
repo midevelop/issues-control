@@ -1,0 +1,30 @@
+{
+  "name": "issues-control",
+  "version": "1.0.0",
+  "description": "Контроль Issues",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/midevelop/issues-control.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/midevelop/issues-control/issues"
+  },
+  "homepage": "https://github.com/midevelop/issues-control#readme",
+  "devDependencies": {
+    "eslint": "^6.6.0",
+    "eslint-config-airbnb-base": "^14.0.0"
+  },
+  "dependencies": {
+    "eslint-plugin-import": "^2.18.2"
+  }
+}
