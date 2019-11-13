@@ -1,44 +1,69 @@
-var app = new Vue({
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+/* eslint-disable no-return-assign */
+const app = new Vue({
   el: '#app',
   data: {
-    username: 'Lyumih',
+    username: 'midevelop',
+    isAuthBasic: true,
+    password: '',
     urlBase: 'https://api.github.com',
     rateLimit: null,
     user: {},
     repos: [],
-    error: ''
+    error: '',
+    page: 1,
   },
   computed: {
     issuesCount() {
       return this.repos.reduce((sum, repo) => sum + repo.open_issues, 0);
-    }
+    },
+    basicAuth() {
+      if (this.isAuthBasic) {
+        const encodedString = `${this.username}:${this.password}`;
+        return {
+          Authorization: `Basic ${btoa(encodedString)}`,
+        };
+      }
+      return {};
+    },
   },
   mounted() {
     this.fetchRateLimit();
   },
   methods: {
     fetchAllData() {
-      this.fetchUser();
-      this.fetchRepos();
-      this.fetchRateLimit();
+      if (this.password) {
+        // this.fetchUser();
+        this.fetchRepos();
+        this.fetchRateLimit();
+      } else {
+        this.error = 'Введите пароль';
+      }
     },
     async fetchUser() {
       await axios
-        .get(`${this.urlBase}/users/${this.username}`)
-        .then(response => (this.user = response.data))
-        .catch(error => (this.error = error));
+        .get(`${this.urlBase}/users/${this.username} `, {
+          headers: this.basicAuth,
+        })
+        .then((response) => (this.user = response.data))
+        .catch((error) => (this.error = error));
     },
     async fetchRepos() {
       await axios
-        .get(`${this.urlBase}/users/${this.username}/repos`)
-        .then(response => (this.repos = response.data))
-        .catch(error => (this.error = error));
+        .get(`${this.urlBase}/user/repos?per_page=100&type=private&page=${this.page}`, {
+          headers: this.basicAuth,
+        })
+        .then((response) => (this.repos = response.data))
+        .catch((error) => (this.error = error));
     },
     async fetchRateLimit() {
       await axios
-        .get(`${this.urlBase}/rate_limit`)
-        .then(response => (this.rateLimit = response.data))
-        .catch(error => (this.error = error));
-    }
-  }
+        .get(`${this.urlBase}/rate_limit`, {
+          headers: this.basicAuth,
+        })
+        .then((response) => (this.rateLimit = response.data))
+        .catch((error) => (this.error = error));
+    },
+  },
 });
