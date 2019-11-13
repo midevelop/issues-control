@@ -1,91 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
 
-    <!-- Bootstrap CSS -->
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-    <title>Issues Control</title>
-  </head>
-  <body>
-    <div class="container" id="app">
-      <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-          <a class="navbar-brand" href="#">Issues Control</a>
-        </nav>
-      </header>
-      <main>
-        <p>
-          <i>Сервис позволяет проверть кол-во открытых issues пользователя</i>
-          <i>Существует лимит на кол-во запросов</i>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <title>Issues Control</title>
+</head>
+
+<body>
+  <div class="container" id="app">
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Issues Control</a>
+      </nav>
+    </header>
+    <main>
+      <p>
+        <i>Сервис позволяет проверть кол-во открытых issues пользователя</i>
+        <i>Существует лимит на кол-во запросов</i>
+      </p>
+      <div v-if="rateLimit" title="Для авторизированных пользователей лимит 5000 в час">
+        <p></p>
+        Лимит запросов: {{ rateLimit.rate.remaining }} из
+        {{ rateLimit.rate.limit }}.
         </p>
-        <div v-if="rateLimit" title="Для авторизированных пользователей лимит 5000 в час">
-          <p></p>
-            Лимит запросов: {{ rateLimit.rate.remaining }} из
-            {{ rateLimit.rate.limit }}.
-          </p>
-          <p>
-            Обновится в
-            {{new Date( rateLimit.rate.reset * 1000).getHours()}}:{{new Date( rateLimit.rate.reset * 1000).getMinutes()}}
-          </p>
-        </div>
+        <p>
+          Обновится
+          {{new Date( rateLimit.rate.reset * 1000)}}
+        </p>
+      </div>
 
-        <div class="form-inline">
-          <button class="btn btn-outline-primary mr-3" @click="fetchAllData">
-            Проверить репозиторий
-          </button>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Логин GitHub"
-            v-model="username"
-          />
+      <div class="form-inline ">
+        <button class="btn btn-outline-primary mr-3" @click="fetchAllData">
+          Проверить репозиторий
+        </button>
+        <input type="text" class="form-control" placeholder="Логин GitHub" v-model="username" />
+
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <input type="checkbox" v-model='isAuthBasic' aria-label="Checkbox for following text input">
+            </div>
+          </div>
+          <input type="password" required placeholder="Введите пароль" class="form-control" v-model="password"
+            aria-label="Text input with checkbox">
+          <!-- https://api.github.com/orgs/Elbrus-Bootcamp/repos?type=private -->
         </div>
+      </div>
+      <div class="form-inline">
+        <label>Страница</label>
+        <input type="number" step="1" min="1" max="100" class="form-control" v-model.number="page">
+      </div>
+      <hr />
+      <div>
+        <pre>{{ error }}</pre>
+        <h2>Кол-во открытых Issues + PullRequest</h2>
+        <pre>{{ issuesCount }}</pre>
         <hr />
-        <div>
-          <pre>{{ error }}</pre>
-          <h2>Кол-во открытых Issues</h2>
-          <pre>{{ issuesCount }}</pre>
-          <hr />
-          <h2>Пользователь</h2>
-          <pre>{{ JSON.stringify(user, null, 2) }}</pre>
-          <h2>Репозитории</h2>
-          <pre>{{ JSON.stringify(repos, null, 2) }}</pre>
-          <hr />
-        </div>
-      </main>
-    </div>
+        <h2>Имена Репозиториев {{repos.length}} штук</h2>
+        <pre>{{ JSON.stringify(repos.map(repo=>repo['full_name']), null, 2) }}</pre>
+        <h2>Репозитории {{repos.length}} штук</h2>
+        <pre>{{ JSON.stringify(repos, null, 2) }}</pre>
+        <h2>Пользователь {{ username }}</h2>
+        <pre class="d-none">{{ JSON.stringify(user, null, 2) }}</pre>
+        <hr />
+      </div>
+    </main>
+  </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-      crossorigin="anonymous"
-    ></script>
-    <script src="js/control.js"></script>
-  </body>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+  <script src="js/control.js"></script>
+</body>
+
 </html>
