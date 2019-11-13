@@ -13,6 +13,7 @@ const app = new Vue({
     repos: [],
     error: '',
     page: 1,
+    owner: 'Elbrus-Bootcamp',
   },
   computed: {
     issuesCount() {
@@ -34,6 +35,7 @@ const app = new Vue({
   methods: {
     fetchAllData() {
       if (this.password) {
+        this.error = '';
         // this.fetchUser();
         this.fetchRepos();
         this.fetchRateLimit();
@@ -51,7 +53,7 @@ const app = new Vue({
     },
     async fetchRepos() {
       await axios
-        .get(`${this.urlBase}/user/repos?per_page=100&type=private&page=${this.page}`, {
+        .get(`${this.urlBase}/orgs/${this.owner}/repos?per_page=100&type=private&page=${this.page}`, {
           headers: this.basicAuth,
         })
         .then((response) => (this.repos = response.data))
